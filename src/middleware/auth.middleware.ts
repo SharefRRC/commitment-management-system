@@ -2,7 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import { auth } from "../config/firebase";
 import { ApiError } from "../utils/api-error";
 
-export const authenticate = async (req: Request, _res: Response, next: NextFunction) => {
+export const authenticate = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
   try {
     const header = req.headers.authorization;
 
@@ -24,3 +28,17 @@ export const authenticate = async (req: Request, _res: Response, next: NextFunct
     next(new ApiError(401, "Unauthorized"));
   }
 };
+
+export const authorize =
+  (...roles: string[]) =>
+  (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new ApiError(401, "Unauthorized"));
+    }
+
+    if (!roles.includes(req.user.role || "user")) {
+      return next(new ApiError(403, "Forbidden"));
+    }
+
+    next();
+  };

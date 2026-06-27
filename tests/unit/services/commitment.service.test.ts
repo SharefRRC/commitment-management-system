@@ -1,3 +1,15 @@
+jest.mock("../../../src/repositories/commitment.repository", () => {
+  return {
+    CommitmentRepository: jest.fn().mockImplementation(() => ({
+      create: jest.fn(),
+      findAllByUser: jest.fn(),
+      findById: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn()
+    }))
+  };
+});
+
 import { CommitmentService } from "../../../src/services/commitment.service";
 import { ApiError } from "../../../src/utils/api-error";
 
