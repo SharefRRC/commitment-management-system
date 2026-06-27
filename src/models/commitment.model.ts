@@ -1,3 +1,6 @@
+export type CommitmentPriority = "low" | "medium" | "high";
+export type CommitmentStatus = "pending" | "in_progress" | "completed" | "overdue";
+
 export interface Commitment {
   id?: string;
   userId: string;
@@ -6,9 +9,10 @@ export interface Commitment {
   dueDate: string;
   mustStartByDate: string;
   estimatedHours: number;
-  priority: "low" | "medium" | "high";
-  status: "pending" | "in_progress" | "completed";
-  categoryId?: string;
+  priority: CommitmentPriority;
+  status: CommitmentStatus;
+  categoryId?: string | null;
+  completedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -1,10 +1,8 @@
-export interface Reminder {
+export interface Category {
   id?: string;
   userId: string;
-  commitmentId: string;
-  reminderDate: string;
-  type: "email" | "system";
-  deliveryState: "pending" | "sent" | "failed";
+  name: string;
+  color?: string;
   createdAt?: string;
   updatedAt?: string;
 }
