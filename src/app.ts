@@ -1,10 +1,9 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-
-import routes from "./routes";
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import routes from './routes';
+import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 import { setupSwagger } from "./config/swagger";
-import { errorHandler, notFoundHandler } from "./middleware/error.middleware";
 
 const app = express();
 
@@ -36,4 +35,5 @@ app.use(notFoundHandler);
 // Global error handler
 app.use(errorHandler);
 
+setupSwagger(app);
 export default app;
