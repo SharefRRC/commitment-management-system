@@ -11,12 +11,20 @@ export class CommitmentRepository {
 
   async findAllByUser(userId: string): Promise<Commitment[]> {
     const snapshot = await collection.where("userId", "==", userId).get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Commitment) }));
+
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Commitment)
+    }));
   }
 
   async findById(id: string): Promise<Commitment | null> {
     const doc = await collection.doc(id).get();
-    if (!doc.exists) return null;
+
+    if (!doc.exists) {
+      return null;
+    }
+
     return { id: doc.id, ...(doc.data() as Commitment) };
   }
 
@@ -26,5 +34,17 @@ export class CommitmentRepository {
 
   async delete(id: string): Promise<void> {
     await collection.doc(id).delete();
+  }
+
+  async findByCategoryId(userId: string, categoryId: string): Promise<Commitment[]> {
+    const snapshot = await collection
+      .where("userId", "==", userId)
+      .where("categoryId", "==", categoryId)
+      .get();
+
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Commitment)
+    }));
   }
 }

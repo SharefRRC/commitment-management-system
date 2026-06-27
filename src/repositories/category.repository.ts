@@ -11,12 +11,35 @@ export class CategoryRepository {
 
   async findAllByUser(userId: string): Promise<Category[]> {
     const snapshot = await collection.where("userId", "==", userId).get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Category) }));
+
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Category)
+    }));
   }
 
   async findById(id: string): Promise<Category | null> {
     const doc = await collection.doc(id).get();
-    if (!doc.exists) return null;
+
+    if (!doc.exists) {
+      return null;
+    }
+
+    return { id: doc.id, ...(doc.data() as Category) };
+  }
+
+  async findByName(userId: string, name: string): Promise<Category | null> {
+    const snapshot = await collection
+      .where("userId", "==", userId)
+      .where("name", "==", name)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return null;
+    }
+
+    const doc = snapshot.docs[0];
     return { id: doc.id, ...(doc.data() as Category) };
   }
 
