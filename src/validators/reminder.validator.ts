@@ -7,4 +7,9 @@ export const createReminderSchema = Joi.object({
   deliveryState: Joi.string().valid("pending", "sent", "failed").required()
 });
 
-export const updateReminderSchema = createReminderSchema;
+export const updateReminderSchema = Joi.object({
+  commitmentId: Joi.string().optional(),
+  reminderDate: Joi.string().isoDate().optional(),
+  type: Joi.string().valid("email", "system").optional(),
+  deliveryState: Joi.string().valid("pending", "sent", "failed").optional()
+});
