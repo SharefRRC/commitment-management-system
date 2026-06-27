@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
+import { setupSwagger } from "./config/swagger";
 
 const app = express();
 
@@ -18,4 +19,5 @@ app.use("/api", routes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+setupSwagger(app);
 export default app;
