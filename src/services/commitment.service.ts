@@ -3,7 +3,11 @@ import { Commitment } from "../models/commitment.model";
 import { ApiError } from "../utils/api-error";
 
 export class CommitmentService {
-  constructor(private repository = new CommitmentRepository()) {}
+  private repository: CommitmentRepository;
+
+  constructor(repository?: CommitmentRepository) {
+    this.repository = repository ?? new CommitmentRepository();
+  }
 
   async create(userId: string, data: Commitment): Promise<Commitment> {
     if (new Date(data.mustStartByDate) > new Date(data.dueDate)) {
