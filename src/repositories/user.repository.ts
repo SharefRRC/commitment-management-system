@@ -1,5 +1,5 @@
 import { db } from "../config/firebase";
-import { UserProfile } from "../models/user.model";
+import { UserProfile } from "../models/user.models";
 
 const collection = db.collection("users");
 
