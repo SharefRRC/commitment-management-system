@@ -1,48 +1,43 @@
-import { Request, Response } from "express";
-import { ReminderService } from "../services/reminder.service";
+import { db } from "../config/firebase";
+import { Reminder } from "../models/reminder.model";
 
-const service = new ReminderService();
+const collection = db.collection("reminders");
 
-export class ReminderController {
-  static async create(req: Request, res: Response) {
-    const data = await service.create(req.user!.uid, req.body);
-
-    res.status(201).json({
-      success: true,
-      data
-    });
+export class ReminderRepository {
+  async create(data: Reminder): Promise<Reminder> {
+    const docRef = await collection.add(data);
+    return { id: docRef.id, ...data };
   }
 
-  static async getAll(req: Request, res: Response) {
-    const data = await service.getAll(req.user!.uid);
-
-    res.status(200).json({
-      success: true,
-      data
-    });
+  async findAllByUser(userId: string): Promise<Reminder[]> {
+    const snapshot = await collection.where("userId", "==", userId).get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Reminder) }));
   }
 
-  static async getById(req: Request, res: Response) {
-    const data = await service.getById(req.user!.uid, req.params.id);
+  async findById(id: string): Promise<Reminder | null> {
+    const doc = await collection.doc(id).get();
 
-    res.status(200).json({
-      success: true,
-      data
-    });
+    if (!doc.exists) {
+      return null;
+    }
+
+    return { id: doc.id, ...(doc.data() as Reminder) };
   }
 
-  static async update(req: Request, res: Response) {
-    const data = await service.update(req.user!.uid, req.params.id, req.body);
+  async findByCommitmentId(userId: string, commitmentId: string): Promise<Reminder[]> {
+    const snapshot = await collection
+      .where("userId", "==", userId)
+      .where("commitmentId", "==", commitmentId)
+      .get();
 
-    res.status(200).json({
-      success: true,
-      data
-    });
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Reminder) }));
   }
 
-  static async delete(req: Request, res: Response) {
-    await service.delete(req.user!.uid, req.params.id);
+  async update(id: string, data: Partial<Reminder>): Promise<void> {
+    await collection.doc(id).update(data);
+  }
 
-    res.status(204).send();
+  async delete(id: string): Promise<void> {
+    await collection.doc(id).delete();
   }
 }
