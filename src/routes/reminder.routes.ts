@@ -3,7 +3,10 @@ import { ReminderController } from "../controllers/reminder.controller";
 import { asyncHandler } from "../utils/async-handler";
 import { authenticate } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
-import { createReminderSchema, updateReminderSchema } from "../validators/reminder.validator";
+import {
+  createReminderSchema,
+  updateReminderSchema
+} from "../validators/reminder.validator";
 
 const router = Router();
 

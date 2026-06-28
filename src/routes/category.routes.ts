@@ -3,7 +3,10 @@ import { CategoryController } from "../controllers/category.controller";
 import { asyncHandler } from "../utils/async-handler";
 import { authenticate } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
-import { createCategorySchema, updateCategorySchema } from "../validators/category.validator";
+import {
+  createCategorySchema,
+  updateCategorySchema
+} from "../validators/category.validator";
 
 const router = Router();
 
