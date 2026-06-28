@@ -1,6 +1,6 @@
 import { auth } from "../config/firebase";
 import { ApiError } from "../utils/api-error";
-import { UserProfile, UserRole } from "../models/user.model";
+import { UserProfile, UserRole } from "../models/user.models";
 import { UserRepository } from "../repositories/user.repository";
 
 interface RegisterUserInput {

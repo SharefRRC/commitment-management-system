@@ -3,6 +3,10 @@ import { AuthService } from "../services/auth.service";
 
 const service = new AuthService();
 
+type IdParams = {
+  id: string;
+};
+
 export class AuthController {
   static async register(req: Request, res: Response) {
     const user = await service.register(req.body);
@@ -22,7 +26,7 @@ export class AuthController {
     });
   }
 
-  static async promoteToAdmin(req: Request, res: Response) {
+  static async promoteToAdmin(req: Request<IdParams>, res: Response) {
     await service.promoteToAdmin(req.user?.role, req.params.id);
 
     res.status(200).json({

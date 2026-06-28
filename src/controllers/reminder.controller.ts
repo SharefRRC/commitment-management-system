@@ -3,6 +3,10 @@ import { ReminderService } from "../services/reminder.service";
 
 const service = new ReminderService();
 
+type IdParams = {
+  id: string;
+};
+
 export class ReminderController {
   static async create(req: Request, res: Response) {
     const data = await service.create(req.user!.uid, req.body);
@@ -22,7 +26,7 @@ export class ReminderController {
     });
   }
 
-  static async getById(req: Request, res: Response) {
+  static async getById(req: Request<IdParams>, res: Response) {
     const data = await service.getById(req.user!.uid, req.params.id);
 
     res.status(200).json({
@@ -31,7 +35,7 @@ export class ReminderController {
     });
   }
 
-  static async update(req: Request, res: Response) {
+  static async update(req: Request<IdParams>, res: Response) {
     const data = await service.update(req.user!.uid, req.params.id, req.body);
 
     res.status(200).json({
@@ -40,7 +44,7 @@ export class ReminderController {
     });
   }
 
-  static async delete(req: Request, res: Response) {
+  static async delete(req: Request<IdParams>, res: Response) {
     await service.delete(req.user!.uid, req.params.id);
 
     res.status(204).send();

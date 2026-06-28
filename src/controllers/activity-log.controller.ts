@@ -4,6 +4,10 @@ import { ApiError } from "../utils/api-error";
 
 const service = new ActivityLogService();
 
+type IdParams = {
+  id: string;
+};
+
 export class ActivityLogController {
   static async getAll(req: Request, res: Response) {
     const data = await service.getAll(req.user!.uid);
@@ -14,7 +18,7 @@ export class ActivityLogController {
     });
   }
 
-  static async getById(req: Request, res: Response) {
+  static async getById(req: Request<IdParams>, res: Response) {
     const data = await service.getById(req.user!.uid, req.params.id);
 
     if (!data) {
@@ -27,7 +31,7 @@ export class ActivityLogController {
     });
   }
 
-  static async getByCommitmentId(req: Request, res: Response) {
+  static async getByCommitmentId(req: Request<IdParams>, res: Response) {
     const data = await service.getByCommitmentId(req.user!.uid, req.params.id);
 
     res.status(200).json({

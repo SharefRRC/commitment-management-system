@@ -3,6 +3,10 @@ import { CommitmentService } from "../services/commitment.service";
 
 const service = new CommitmentService();
 
+type IdParams = {
+  id: string;
+};
+
 export class CommitmentController {
   static async create(req: Request, res: Response) {
     const data = await service.create(req.user!.uid, req.body);
@@ -22,7 +26,7 @@ export class CommitmentController {
     });
   }
 
-  static async getById(req: Request, res: Response) {
+  static async getById(req: Request<IdParams>, res: Response) {
     const data = await service.getById(req.user!.uid, req.params.id);
 
     res.status(200).json({
@@ -31,7 +35,7 @@ export class CommitmentController {
     });
   }
 
-  static async update(req: Request, res: Response) {
+  static async update(req: Request<IdParams>, res: Response) {
     const data = await service.update(req.user!.uid, req.params.id, req.body);
 
     res.status(200).json({
@@ -40,7 +44,7 @@ export class CommitmentController {
     });
   }
 
-  static async updateStatus(req: Request, res: Response) {
+  static async updateStatus(req: Request<IdParams>, res: Response) {
     const data = await service.updateStatus(
       req.user!.uid,
       req.params.id,
@@ -54,7 +58,7 @@ export class CommitmentController {
     });
   }
 
-  static async delete(req: Request, res: Response) {
+  static async delete(req: Request<IdParams>, res: Response) {
     await service.delete(req.user!.uid, req.params.id);
 
     res.status(204).send();
