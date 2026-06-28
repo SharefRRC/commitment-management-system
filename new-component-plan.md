@@ -1,37 +1,51 @@
 # New Component Plan
 
 ## Chosen Component
-Productivity Analytics for the Commitment Management System API.
+Productivity Analytics
 
-## Why I chose it
-This component aligns strongly with the main purpose of the project: helping me or anyone who uses it to not only track commitments, but also understand their work patterns and late-start habits.
+## Why I Chose It
+I chose Productivity Analytics because it directly supports the core purpose of my project.
+The Commitment Management System API is not only about storing commitments. Its main value is helping users understand when they are starting too late, missing deadlines, or struggling in certain categories.
 
-## Planned Features
+## Planned Value to the Project
+This component adds useful insight on top of the normal CRUD API.
+Instead of only managing commitments, users can also review patterns in their productivity and deadline performance.
+
+## Planned Metrics
 - Total commitments completed
 - Number of late starts
-- Number of overdue commitments
+- Number of overdue items
 - Most delayed category
 - Average delay in days
 
-## Why it adds value
-I dont want the project to be a task API. Its unique value is deadline awareness and better planning. Analytics supports that goal by turning commitment history into useful feedback.
+## Data Sources
+This component uses:
+- commitment data
+- due dates
+- must-start-by dates
+- completion timestamps
+- category associations
+- activity log records
 
-## Planned Integration
-- Use commitments and later activity-log data as data sources
-- Add analytics service layer
-- Add analytics endpoints such as:
-  - GET /analytics/summary
-  - GET /analytics/categories
-  - GET /analytics/delays
+## Planned API Endpoints
+- GET /api/analytics/summary
+- GET /api/analytics/categories
+- GET /api/analytics/delays
 
-## Implementation Plan
-1. Finalize commitment status and date fields in Milestone 1.
-2. Add activity logs in Milestone 2.
-3. Build analytics calculations in the service layer.
-4. Expose analytics endpoints with Swagger documentation.
-5. Add tests for analytics calculations.
+## Integration Plan
+1. Finish core CRUD resources first
+2. Ensure commitment status and date fields are consistent
+3. Add activity logging for important actions
+4. Build analytics calculations in the service layer
+5. Expose analytics results through dedicated endpoints
+6. Add Swagger documentation
+7. Add Jest tests for analytics logic
 
-## Risks / Constraints
-- Analytics depends on consistent date and status data.
-- Some metrics are stronger once activity logs are implemented.
-- To keep Milestone 1 manageable, this component will be planned now and implemented in later milestones.
+## Risks and Considerations
+- Analytics depends on reliable date and status data
+- Incomplete historical data can reduce metric quality
+- Some analytics become stronger once more activity tracking is added
+
+## Why It Fits the Course
+This component adds meaningful back-end logic without changing the required stack.
+It stays manageable while still being more interesting than a basic CRUD-only API.

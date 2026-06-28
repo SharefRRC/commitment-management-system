@@ -12,4 +12,4 @@ export const updateReminderSchema = Joi.object({
   reminderDate: Joi.string().isoDate().optional(),
   type: Joi.string().valid("email", "system").optional(),
   deliveryState: Joi.string().valid("pending", "sent", "failed").optional()
-});
+}).min(1);

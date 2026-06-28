@@ -30,13 +30,15 @@ export const authenticate = async (
 };
 
 export const authorize =
-  (...roles: string[]) =>
+  (...allowedRoles: string[]) =>
   (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new ApiError(401, "Unauthorized"));
     }
 
-    if (!roles.includes(req.user.role || "user")) {
+    const userRole = req.user.role || "user";
+
+    if (!allowedRoles.includes(userRole)) {
       return next(new ApiError(403, "Forbidden"));
     }
 
