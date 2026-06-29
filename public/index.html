@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commitment Management System Demo</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --panel-3: #0b1220;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #374151;
+      --primary: #22c55e;
+      --secondary: #3b82f6;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      background: var(--panel-3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+    }
+
+    .top-grid,
+    .resource-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .top-grid {
+      grid-template-columns: 1fr;
+      margin-bottom: 20px;
+    }
+
+    .resource-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .btn-row button {
+      width: auto;
+      min-width: 120px;
+    }
+
+    .primary { background: var(--primary); color: #052e16; border: none; }
+    .secondary { background: var(--secondary); color: white; border: none; }
+    .warning { background: var(--warning); color: black; border: none; }
+    .danger { background: var(--danger); color: white; border: none; }
+
+    .list {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .item {
+      background: var(--panel-3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .item p {
+      margin: 6px 0;
+      word-break: break-word;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 999px;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      .resource-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Commitment Management System Demo</h1>
+    <p class="muted">Login and manage commitments, categories, and reminders.</p>
+
+    <div class="top-grid">
+      <section class="card">
+        <h2>Authentication</h2>
+        <div id="authStatus" class="status">Not authenticated</div>
+        <div id="globalMessage" class="status">Ready</div>
+
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="demo@test.com" />
+
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Password123!" />
+
+        <div class="btn-row">
+          <button id="loginBtn" class="primary">Login</button>
+          <button id="demoLoginBtn" class="secondary">Demo Login</button>
+          <button id="logoutBtn" class="danger">Logout</button>
+          <button id="refreshAllBtn" class="warning">Refresh All</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="resource-grid">
+      <section class="card">
+        <h2>Commitments</h2>
+        <div id="commitmentMode" class="status">Mode: Create</div>
+
+        <label for="commitmentTitle">Title</label>
+        <input id="commitmentTitle" type="text" />
+
+        <label for="commitmentDescription">Description</label>
+        <textarea id="commitmentDescription"></textarea>
+
+        <label for="commitmentDueDate">Due Date</label>
+        <input id="commitmentDueDate" type="datetime-local" />
+
+        <label for="commitmentMustStartByDate">Must Start By Date</label>
+        <input id="commitmentMustStartByDate" type="datetime-local" />
+
+        <label for="commitmentEstimatedHours">Estimated Hours</label>
+        <input id="commitmentEstimatedHours" type="number" min="1" value="2" />
+
+        <label for="commitmentPriority">Priority</label>
+        <select id="commitmentPriority">
+          <option value="low">low</option>
+          <option value="medium" selected>medium</option>
+          <option value="high">high</option>
+        </select>
+
+        <label for="commitmentStatus">Status</label>
+        <select id="commitmentStatus">
+          <option value="pending" selected>pending</option>
+          <option value="inprogress">inprogress</option>
+          <option value="completed">completed</option>
+          <option value="overdue">overdue</option>
+        </select>
+
+        <label for="commitmentCategoryId">Category ID (optional)</label>
+        <input id="commitmentCategoryId" type="text" placeholder="Paste category id if needed" />
+
+        <div class="btn-row">
+          <button id="saveCommitmentBtn" class="primary">Save</button>
+          <button id="cancelCommitmentBtn" class="warning">Cancel</button>
+        </div>
+
+        <div id="commitmentsList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Categories</h2>
+        <div id="categoryMode" class="status">Mode: Create</div>
+
+        <label for="categoryName">Name</label>
+        <input id="categoryName" type="text" />
+
+        <label for="categoryColor">Color</label>
+        <input id="categoryColor" type="text" placeholder="blue / red / #22c55e" />
+
+        <div class="btn-row">
+          <button id="saveCategoryBtn" class="primary">Save</button>
+          <button id="cancelCategoryBtn" class="warning">Cancel</button>
+        </div>
+
+        <div id="categoriesList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Reminders</h2>
+        <div id="reminderMode" class="status">Mode: Create</div>
+
+        <label for="reminderCommitmentId">Commitment ID</label>
+        <input id="reminderCommitmentId" type="text" placeholder="Paste commitment id" />
+
+        <label for="reminderDate">Reminder Date</label>
+        <input id="reminderDate" type="datetime-local" />
+
+        <label for="reminderType">Type</label>
+        <select id="reminderType">
+          <option value="email">email</option>
+          <option value="system" selected>system</option>
+        </select>
+
+        <label for="reminderDeliveryState">Delivery State</label>
+        <select id="reminderDeliveryState">
+          <option value="pending" selected>pending</option>
+          <option value="sent">sent</option>
+          <option value="failed">failed</option>
+        </select>
+
+        <div class="btn-row">
+          <button id="saveReminderBtn" class="primary">Save</button>
+          <button id="cancelReminderBtn" class="warning">Cancel</button>
+        </div>
+
+        <div id="remindersList" class="list"></div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -1,2 +1,17 @@
 "use strict";
-//# sourceMappingURL=commitment.routes.js.map
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const commitment_controller_1 = require("../controllers/commitment.controller");
+const async_handler_1 = require("../utils/async-handler");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const validate_middleware_1 = require("../middleware/validate.middleware");
+const commitment_validator_1 = require("../validators/commitment.validator");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticate);
+router.get("/", (0, async_handler_1.asyncHandler)(commitment_controller_1.CommitmentController.getAll));
+router.get("/:id", (0, async_handler_1.asyncHandler)(commitment_controller_1.CommitmentController.getById));
+router.post("/", (0, validate_middleware_1.validate)(commitment_validator_1.createCommitmentSchema), (0, async_handler_1.asyncHandler)(commitment_controller_1.CommitmentController.create));
+router.put("/:id", (0, validate_middleware_1.validate)(commitment_validator_1.updateCommitmentSchema), (0, async_handler_1.asyncHandler)(commitment_controller_1.CommitmentController.update));
+router.patch("/:id/status", (0, validate_middleware_1.validate)(commitment_validator_1.updateCommitmentStatusSchema), (0, async_handler_1.asyncHandler)(commitment_controller_1.CommitmentController.updateStatus));
+router.delete("/:id", (0, async_handler_1.asyncHandler)(commitment_controller_1.CommitmentController.delete));
+exports.default = router;
