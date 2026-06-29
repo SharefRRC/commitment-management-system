@@ -6,9 +6,6 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/*
-  Replace with your Firebase WEB APP config
-*/
 const firebaseConfig = {
   apiKey: "AIzaSyAcrAUidtpHqhfVf8fcoAG1-NcHbv01fy0",
   authDomain: "commitment-management-system.firebaseapp.com",
@@ -25,12 +22,17 @@ let commitments = [];
 let categories = [];
 let reminders = [];
 
+let analyticsSummary = null;
+let analyticsCategories = [];
+let analyticsDelays = [];
+
 let editingCommitmentId = null;
 let editingCategoryId = null;
 let editingReminderId = null;
 
 const authStatus = document.getElementById("authStatus");
 const globalMessage = document.getElementById("globalMessage");
+const analyticsStatus = document.getElementById("analyticsStatus");
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -60,10 +62,15 @@ const commitmentsList = document.getElementById("commitmentsList");
 const categoriesList = document.getElementById("categoriesList");
 const remindersList = document.getElementById("remindersList");
 
+const summaryStats = document.getElementById("summaryStats");
+const categoryAnalyticsList = document.getElementById("categoryAnalyticsList");
+const delayAnalyticsList = document.getElementById("delayAnalyticsList");
+
 document.getElementById("loginBtn").addEventListener("click", handleLogin);
 document.getElementById("demoLoginBtn").addEventListener("click", handleDemoLogin);
 document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 document.getElementById("refreshAllBtn").addEventListener("click", refreshAll);
+document.getElementById("loadAnalyticsBtn").addEventListener("click", loadAllAnalytics);
 
 document.getElementById("saveCommitmentBtn").addEventListener("click", saveCommitment);
 document.getElementById("cancelCommitmentBtn").addEventListener("click", cancelCommitmentEdit);
@@ -74,6 +81,10 @@ document.getElementById("cancelCategoryBtn").addEventListener("click", cancelCat
 document.getElementById("saveReminderBtn").addEventListener("click", saveReminder);
 document.getElementById("cancelReminderBtn").addEventListener("click", cancelReminderEdit);
 
+document.getElementById("loadSummaryBtn").addEventListener("click", loadSummaryAnalytics);
+document.getElementById("loadCategoryAnalyticsBtn").addEventListener("click", loadCategoryAnalytics);
+document.getElementById("loadDelayAnalyticsBtn").addEventListener("click", loadDelayAnalytics);
+
 onAuthStateChanged(firebaseAuth, async (user) => {
   if (user) {
     currentUser = user;
@@ -81,15 +92,23 @@ onAuthStateChanged(firebaseAuth, async (user) => {
     setAuthStatus(`Authenticated as ${user.email}`);
     setMessage("Login successful.");
     await refreshAll();
+    await loadAllAnalytics();
   } else {
     currentUser = null;
     idToken = "";
     setAuthStatus("Not authenticated");
     setMessage("Please login.");
+    setAnalyticsStatus("Analytics not loaded yet.");
+
     commitments = [];
     categories = [];
     reminders = [];
+    analyticsSummary = null;
+    analyticsCategories = [];
+    analyticsDelays = [];
+
     renderAll();
+    renderAnalytics();
   }
 });
 
@@ -137,6 +156,10 @@ function setMessage(text) {
   globalMessage.textContent = text;
 }
 
+function setAnalyticsStatus(text) {
+  analyticsStatus.textContent = text;
+}
+
 function toIsoDate(localValue) {
   if (!localValue) return null;
   return new Date(localValue).toISOString();
@@ -177,6 +200,18 @@ function normalizeData(result) {
   return [];
 }
 
+function normalizeObject(result) {
+  if (result?.data && typeof result.data === "object" && !Array.isArray(result.data)) {
+    return result.data;
+  }
+
+  if (result && typeof result === "object" && !Array.isArray(result)) {
+    return result;
+  }
+
+  return null;
+}
+
 async function refreshAll() {
   try {
     if (!idToken) {
@@ -201,10 +236,144 @@ async function refreshAll() {
   }
 }
 
+async function loadAllAnalytics() {
+  try {
+    if (!idToken) {
+      setAnalyticsStatus("Login first to load analytics.");
+      return;
+    }
+
+    const [summaryRes, categoriesRes, delaysRes] = await Promise.all([
+      api("/api/analytics/summary"),
+      api("/api/analytics/categories"),
+      api("/api/analytics/delays")
+    ]);
+
+    analyticsSummary = normalizeObject(summaryRes);
+    analyticsCategories = normalizeData(categoriesRes);
+    analyticsDelays = normalizeData(delaysRes);
+
+    renderAnalytics();
+    setAnalyticsStatus("Loaded summary, category analytics, and delay analytics.");
+  } catch (error) {
+    setAnalyticsStatus(`Analytics load failed: ${error.message}`);
+  }
+}
+
+async function loadSummaryAnalytics() {
+  try {
+    if (!idToken) {
+      setAnalyticsStatus("Login first to load summary analytics.");
+      return;
+    }
+
+    const result = await api("/api/analytics/summary");
+    analyticsSummary = normalizeObject(result);
+
+    renderAnalytics();
+    setAnalyticsStatus("Loaded summary analytics.");
+  } catch (error) {
+    setAnalyticsStatus(`Summary analytics failed: ${error.message}`);
+  }
+}
+
+async function loadCategoryAnalytics() {
+  try {
+    if (!idToken) {
+      setAnalyticsStatus("Login first to load category analytics.");
+      return;
+    }
+
+    const result = await api("/api/analytics/categories");
+    analyticsCategories = normalizeData(result);
+
+    renderAnalytics();
+    setAnalyticsStatus("Loaded category analytics.");
+  } catch (error) {
+    setAnalyticsStatus(`Category analytics failed: ${error.message}`);
+  }
+}
+
+async function loadDelayAnalytics() {
+  try {
+    if (!idToken) {
+      setAnalyticsStatus("Login first to load delay analytics.");
+      return;
+    }
+
+    const result = await api("/api/analytics/delays");
+    analyticsDelays = normalizeData(result);
+
+    renderAnalytics();
+    setAnalyticsStatus("Loaded delay analytics.");
+  } catch (error) {
+    setAnalyticsStatus(`Delay analytics failed: ${error.message}`);
+  }
+}
+
 function renderAll() {
   renderCommitments();
   renderCategories();
   renderReminders();
+}
+
+function renderAnalytics() {
+  renderSummaryAnalytics();
+  renderCategoryAnalytics();
+  renderDelayAnalytics();
+}
+
+function renderSummaryAnalytics() {
+  if (!analyticsSummary) {
+    summaryStats.innerHTML = `<div class="item"><p>No summary analytics loaded.</p></div>`;
+    return;
+  }
+
+  const entries = Object.entries(analyticsSummary);
+
+  summaryStats.innerHTML = entries.map(([key, value]) => `
+    <div class="stat-box">
+      <div class="stat-label">${escapeHtml(formatKey(key))}</div>
+      <div class="stat-value">${escapeHtml(String(value ?? "N/A"))}</div>
+    </div>
+  `).join("");
+}
+
+function renderCategoryAnalytics() {
+  if (!analyticsCategories.length) {
+    categoryAnalyticsList.innerHTML = `<div class="item"><p>No category analytics loaded.</p></div>`;
+    return;
+  }
+
+  categoryAnalyticsList.innerHTML = analyticsCategories.map((item) => `
+    <div class="item">
+      <h3>${escapeHtml(item.categoryName || item.name || "Category")}</h3>
+      <p><span class="pill">Total: ${escapeHtml(String(item.total ?? item.count ?? 0))}</span></p>
+      ${item.completed !== undefined ? `<p><strong>Completed:</strong> ${escapeHtml(String(item.completed))}</p>` : ""}
+      ${item.overdue !== undefined ? `<p><strong>Overdue:</strong> ${escapeHtml(String(item.overdue))}</p>` : ""}
+      ${item.lateStarts !== undefined ? `<p><strong>Late Starts:</strong> ${escapeHtml(String(item.lateStarts))}</p>` : ""}
+      ${item.averageDelayDays !== undefined ? `<p><strong>Average Delay Days:</strong> ${escapeHtml(String(item.averageDelayDays))}</p>` : ""}
+    </div>
+  `).join("");
+}
+
+function renderDelayAnalytics() {
+  if (!analyticsDelays.length) {
+    delayAnalyticsList.innerHTML = `<div class="item"><p>No delay analytics loaded.</p></div>`;
+    return;
+  }
+
+  delayAnalyticsList.innerHTML = analyticsDelays.map((item, index) => `
+    <div class="item">
+      <h3>${escapeHtml(item.title || item.categoryName || `Delay Item ${index + 1}`)}</h3>
+      ${item.commitmentId ? `<p><strong>Commitment ID:</strong> ${escapeHtml(item.commitmentId)}</p>` : ""}
+      ${item.categoryId ? `<p><strong>Category ID:</strong> ${escapeHtml(item.categoryId)}</p>` : ""}
+      ${item.delayDays !== undefined ? `<p><strong>Delay Days:</strong> ${escapeHtml(String(item.delayDays))}</p>` : ""}
+      ${item.lateStarts !== undefined ? `<p><strong>Late Starts:</strong> ${escapeHtml(String(item.lateStarts))}</p>` : ""}
+      ${item.overdueCount !== undefined ? `<p><strong>Overdue Count:</strong> ${escapeHtml(String(item.overdueCount))}</p>` : ""}
+      ${item.averageDelayDays !== undefined ? `<p><strong>Average Delay Days:</strong> ${escapeHtml(String(item.averageDelayDays))}</p>` : ""}
+    </div>
+  `).join("");
 }
 
 /* ---------------- Commitments ---------------- */
@@ -271,6 +440,7 @@ async function saveCommitment() {
 
     cancelCommitmentEdit();
     await refreshAll();
+    await loadAllAnalytics();
   } catch (error) {
     setMessage(`Commitment save failed: ${error.message}`);
   }
@@ -302,6 +472,7 @@ async function deleteCommitment(id) {
     if (editingCommitmentId === id) cancelCommitmentEdit();
     setMessage("Commitment deleted.");
     await refreshAll();
+    await loadAllAnalytics();
   } catch (error) {
     setMessage(`Commitment delete failed: ${error.message}`);
   }
@@ -391,6 +562,7 @@ async function saveCategory() {
 
     cancelCategoryEdit();
     await refreshAll();
+    await loadAllAnalytics();
   } catch (error) {
     setMessage(`Category save failed: ${error.message}`);
   }
@@ -416,6 +588,7 @@ async function deleteCategory(id) {
     if (editingCategoryId === id) cancelCategoryEdit();
     setMessage("Category deleted.");
     await refreshAll();
+    await loadAllAnalytics();
   } catch (error) {
     setMessage(`Category delete failed: ${error.message}`);
   }
@@ -502,6 +675,7 @@ async function saveReminder() {
 
     cancelReminderEdit();
     await refreshAll();
+    await loadAllAnalytics();
   } catch (error) {
     setMessage(`Reminder save failed: ${error.message}`);
   }
@@ -529,6 +703,7 @@ async function deleteReminder(id) {
     if (editingReminderId === id) cancelReminderEdit();
     setMessage("Reminder deleted.");
     await refreshAll();
+    await loadAllAnalytics();
   } catch (error) {
     setMessage(`Reminder delete failed: ${error.message}`);
   }
@@ -577,6 +752,12 @@ function formatDate(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString();
+}
+
+function formatKey(value) {
+  return String(value)
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase());
 }
 
 function escapeHtml(value) {
