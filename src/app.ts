@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import path from "path";
 import routes from "./routes";
 import { setupSwagger } from "./config/swagger";
 import {
@@ -10,7 +11,13 @@ import {
 
 const app = express();
 
-app.use(helmet());
+const publicPath = path.resolve(__dirname, "../../public");
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false
+  })
+);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,7 +30,15 @@ app.get("/health", (_req, res) => {
 });
 
 setupSwagger(app);
+
 app.use("/api", routes);
+
+app.use(express.static(publicPath));
+
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
+});
+
 app.use(notFoundHandler);
 app.use(errorHandler);
 

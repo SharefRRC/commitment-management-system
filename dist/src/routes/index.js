@@ -1,2 +1,24 @@
 "use strict";
-//# sourceMappingURL=index.js.map
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_routes_1 = __importDefault(require("./auth.routes"));
+const commitment_routes_1 = __importDefault(require("./commitment.routes"));
+const category_routes_1 = __importDefault(require("./category.routes"));
+const reminder_routes_1 = __importDefault(require("./reminder.routes"));
+const activity_log_routes_1 = __importDefault(require("./activity-log.routes"));
+const analytics_routes_1 = __importDefault(require("./analytics.routes"));
+const activity_log_controller_1 = require("../controllers/activity-log.controller");
+const async_handler_1 = require("../utils/async-handler");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.use("/auth", auth_routes_1.default);
+router.use("/commitments", commitment_routes_1.default);
+router.use("/categories", category_routes_1.default);
+router.use("/reminders", reminder_routes_1.default);
+router.use("/activity-logs", activity_log_routes_1.default);
+router.use("/analytics", analytics_routes_1.default);
+router.get("/commitments/:id/activity-logs", auth_middleware_1.authenticate, (0, async_handler_1.asyncHandler)(activity_log_controller_1.ActivityLogController.getByCommitmentId));
+exports.default = router;

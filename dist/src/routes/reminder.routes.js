@@ -1,2 +1,16 @@
 "use strict";
-//# sourceMappingURL=reminder.routes.js.map
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const reminder_controller_1 = require("../controllers/reminder.controller");
+const async_handler_1 = require("../utils/async-handler");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const validate_middleware_1 = require("../middleware/validate.middleware");
+const reminder_validator_1 = require("../validators/reminder.validator");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticate);
+router.get("/", (0, async_handler_1.asyncHandler)(reminder_controller_1.ReminderController.getAll));
+router.get("/:id", (0, async_handler_1.asyncHandler)(reminder_controller_1.ReminderController.getById));
+router.post("/", (0, validate_middleware_1.validate)(reminder_validator_1.createReminderSchema), (0, async_handler_1.asyncHandler)(reminder_controller_1.ReminderController.create));
+router.put("/:id", (0, validate_middleware_1.validate)(reminder_validator_1.updateReminderSchema), (0, async_handler_1.asyncHandler)(reminder_controller_1.ReminderController.update));
+router.delete("/:id", (0, async_handler_1.asyncHandler)(reminder_controller_1.ReminderController.delete));
+exports.default = router;

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commitment Management System Demo</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Commitment Management System Demo</h1>
+    <p class="muted">Login and manage commitments, categories, reminders, and analytics.</p>
+
+    <div class="top-grid">
+      <section class="card">
+        <h2>Authentication</h2>
+        <div id="authStatus" class="status">Not authenticated</div>
+        <div id="globalMessage" class="status">Ready</div>
+
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="demo@test.com" />
+
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Password123!" />
+
+        <div class="btn-row">
+          <button id="loginBtn" class="primary">Login</button>
+          <button id="demoLoginBtn" class="secondary">Demo Login</button>
+          <button id="logoutBtn" class="danger">Logout</button>
+          <button id="refreshAllBtn" class="warning">Refresh All</button>
+          <button id="loadAnalyticsBtn" class="accent">Load Analytics</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="resource-grid">
+      <section class="card">
+        <h2>Commitments</h2>
+        <div id="commitmentMode" class="status">Mode: Create</div>
+
+        <label for="commitmentTitle">Title</label>
+        <input id="commitmentTitle" type="text" />
+
+        <label for="commitmentDescription">Description</label>
+        <textarea id="commitmentDescription"></textarea>
+
+        <label for="commitmentDueDate">Due Date</label>
+        <input id="commitmentDueDate" type="datetime-local" />
+
+        <label for="commitmentMustStartByDate">Must Start By Date</label>
+        <input id="commitmentMustStartByDate" type="datetime-local" />
+
+        <label for="commitmentEstimatedHours">Estimated Hours</label>
+        <input id="commitmentEstimatedHours" type="number" min="1" value="2" />
+
+        <label for="commitmentPriority">Priority</label>
+        <select id="commitmentPriority">
+          <option value="low">low</option>
+          <option value="medium" selected>medium</option>
+          <option value="high">high</option>
+        </select>
+
+        <label for="commitmentStatus">Status</label>
+        <select id="commitmentStatus">
+          <option value="pending" selected>pending</option>
+          <option value="inprogress">inprogress</option>
+          <option value="completed">completed</option>
+          <option value="overdue">overdue</option>
+        </select>
+
+        <label for="commitmentCategoryId">Category ID (optional)</label>
+        <input id="commitmentCategoryId" type="text" placeholder="Paste category id if needed" />
+
+        <div class="btn-row">
+          <button id="saveCommitmentBtn" class="primary">Save</button>
+          <button id="cancelCommitmentBtn" class="warning">Cancel</button>
+        </div>
+
+        <div id="commitmentsList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Categories</h2>
+        <div id="categoryMode" class="status">Mode: Create</div>
+
+        <label for="categoryName">Name</label>
+        <input id="categoryName" type="text" />
+
+        <label for="categoryColor">Color</label>
+        <input id="categoryColor" type="text" placeholder="blue / red / #22c55e" />
+
+        <div class="btn-row">
+          <button id="saveCategoryBtn" class="primary">Save</button>
+          <button id="cancelCategoryBtn" class="warning">Cancel</button>
+        </div>
+
+        <div id="categoriesList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Reminders</h2>
+        <div id="reminderMode" class="status">Mode: Create</div>
+
+        <label for="reminderCommitmentId">Commitment ID</label>
+        <input id="reminderCommitmentId" type="text" placeholder="Paste commitment id" />
+
+        <label for="reminderDate">Reminder Date</label>
+        <input id="reminderDate" type="datetime-local" />
+
+        <label for="reminderType">Type</label>
+        <select id="reminderType">
+          <option value="email">email</option>
+          <option value="system" selected>system</option>
+        </select>
+
+        <label for="reminderDeliveryState">Delivery State</label>
+        <select id="reminderDeliveryState">
+          <option value="pending" selected>pending</option>
+          <option value="sent">sent</option>
+          <option value="failed">failed</option>
+        </select>
+
+        <div class="btn-row">
+          <button id="saveReminderBtn" class="primary">Save</button>
+          <button id="cancelReminderBtn" class="warning">Cancel</button>
+        </div>
+
+        <div id="remindersList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Analytics</h2>
+        <div id="analyticsStatus" class="status">Analytics not loaded yet.</div>
+
+        <div class="btn-row">
+          <button id="loadSummaryBtn" class="accent">Load Summary</button>
+          <button id="loadCategoryAnalyticsBtn" class="secondary">Load Categories</button>
+          <button id="loadDelayAnalyticsBtn" class="warning">Load Delays</button>
+        </div>
+
+        <div id="summaryStats" class="stats-grid"></div>
+
+        <div class="analytics-block">
+          <h3>Category Analytics</h3>
+          <div id="categoryAnalyticsList" class="list"></div>
+        </div>
+
+        <div class="analytics-block">
+          <h3>Delay Analytics</h3>
+          <div id="delayAnalyticsList" class="list"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
